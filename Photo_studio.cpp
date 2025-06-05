@@ -86,23 +86,20 @@ int addService() {
 int listServices() {
     cout << "Список услуг:\n";
     cout << services;
-    cout << "listServices() завершен\n";
     return 6;
 }
 
 int sortServicesByPrice() {
     try {
-        cout << "Начинаем сортировку...\n";
         services.sort();
-        cout << "Сортировка завершена, проверяем список...\n";
+        cout << "Услуги успешно отсортированы по цене.\n";
         listServices();
-        cout << "Вывод списка успешно выполнен, возвращаем управление.\n";
         return 7;
     } catch (const std::bad_alloc& e) {
         cout << "Ошибка памяти при сортировке: " << e.what() << endl;
         return 7;
     } catch (...) {
-        cout << "Неизвестная ошибка при сортировке.\n";
+        cout << "Ошибка при сортировке услуг.\n";
         return 7;
     }
 }
@@ -317,8 +314,6 @@ int main() {
     try {
         services.add(new ItemList<Service>(Service("Фотосессия", 6000.0, "Стандартная фотосессия в студии")));
         services.add(new ItemList<Service>(Service("Портрет", 7000.0, "Профессиональный портрет")));
-        cout << "Список услуг после инициализации:\n";
-        cout << services;
         Employee* emp = new Employee("Иван", "Петров", 30, "ivan", "123", "Фотограф");
         employees.add(new ItemList<Employee>(*emp));
         auto it = services.begin();
@@ -356,9 +351,7 @@ int main() {
             CMenuItem{"Загрузить услуги из файла", loadServicesFromFile}
         };
         CMenu menu("Фотостудия - Управление", items, ITEMS_NUMBER);
-        while (menu.runCommand()) {
-            cout << "Цикл меню продолжается\n";
-        };
+        while (menu.runCommand()) {};
         cout << "Программа завершена. Нажмите Enter для выхода...\n";
         cin.get();
     } catch (const std::exception& e) {

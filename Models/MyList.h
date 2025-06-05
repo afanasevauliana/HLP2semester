@@ -135,9 +135,6 @@ public:
             return;
         }
 
-        std::cout << "Начинаем сортировку, длина списка: " << m_len << "\n";
-        
-        // Отсоединяем все элементы от m_end перед сортировкой
         ItemList<T>* current = m_start;
         while (current != nullptr && current != m_end) {
             current->setNext(nullptr);
@@ -169,7 +166,6 @@ public:
             current = next;
         }
 
-        // Обновляем m_start и связываем с m_end
         m_start = sorted;
         if (m_start == nullptr) {
             m_start = m_end;
@@ -177,7 +173,6 @@ public:
             return;
         }
 
-        // Находим новый конец списка и связываем с m_end
         ItemList<T>* newEnd = m_start;
         while (newEnd->getNext() != nullptr) {
             newEnd = newEnd->getNext();

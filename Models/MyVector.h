@@ -87,6 +87,7 @@ public:
     const_iterator end() const { return const_iterator(m_end); }
 
     void sort() {
+        if (m_size <= 1) return;
         for (size_t i = 0; i < m_size - 1; ++i) {
             for (size_t j = 0; j < m_size - i - 1; ++j) {
                 if (m_array[j] > m_array[j + 1]) {

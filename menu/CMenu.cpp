@@ -40,10 +40,8 @@ int CMenu::runCommand() {
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         throw std::invalid_argument("Некорректный выбор пункта меню");
     }
-    std::cout << "Выбран пункт: " << select << "\n";
     if (select > 0 && static_cast<size_t>(select) <= count) {
         int result = items[select - 1].run();
-        std::cout << "Функция вернула: " << result << "\n";
         return result;
     } else {
         return 0;
