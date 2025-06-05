@@ -130,11 +130,27 @@ public:
     }
 
     void sort() {
-        if (m_len <= 1) return;
+        if (m_len <= 1) {
+            std::cout << "Список пуст или содержит один элемент, сортировка не требуется\n";
+            return;
+        }
+
+        std::cout << "Начинаем сортировку, длина списка: " << m_len << "\n";
+        
+        // Отсоединяем все элементы от m_end перед сортировкой
         ItemList<T>* current = m_start;
+        while (current != nullptr && current != m_end) {
+            current->setNext(nullptr);
+            current->setBack(nullptr);
+            current = current->getNext();
+        }
+
         ItemList<T>* sorted = nullptr;
-        while (current != m_end) {
+        current = m_start;
+        
+        while (current != nullptr && current != m_end) {
             ItemList<T>* next = current->getNext();
+            
             if (sorted == nullptr || sorted->get() > current->get()) {
                 current->setNext(sorted);
                 if (sorted) sorted->setBack(current);
@@ -142,7 +158,7 @@ public:
                 sorted = current;
             } else {
                 ItemList<T>* temp = sorted;
-                while (temp->getNext() != m_end && temp->getNext()->get() < current->get()) {
+                while (temp->getNext() != nullptr && temp->getNext()->get() < current->get()) {
                     temp = temp->getNext();
                 }
                 current->setNext(temp->getNext());
@@ -152,12 +168,24 @@ public:
             }
             current = next;
         }
+
+        // Обновляем m_start и связываем с m_end
         m_start = sorted;
-        while (sorted->getNext() != m_end) {
-            sorted = sorted->getNext();
+        if (m_start == nullptr) {
+            m_start = m_end;
+            m_end->setBack(nullptr);
+            return;
         }
-        sorted->setNext(m_end);
-        m_end->setBack(sorted);
+
+        // Находим новый конец списка и связываем с m_end
+        ItemList<T>* newEnd = m_start;
+        while (newEnd->getNext() != nullptr) {
+            newEnd = newEnd->getNext();
+        }
+        newEnd->setNext(m_end);
+        m_end->setBack(newEnd);
+
+        std::cout << "Сортировка завершена\n";
     }
 
     iterator begin() { return iterator(m_start); }
@@ -182,7 +210,7 @@ private:
     size_t m_len;
 
     void initList(ItemList<T>& it) {
-        m_start = &it;
+        m_start = new ItemList<T>(it.get());
         m_end = new ItemList<T>();
         m_start->setNext(m_end);
         m_end->setBack(m_start);

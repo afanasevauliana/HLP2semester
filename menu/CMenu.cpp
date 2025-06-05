@@ -1,4 +1,5 @@
 #include "./CMenu.h"
+#include <limits>
 
 CMenu::CMenu(string title, CMenuItem *items, size_t count) : title(title), items(items), count(count) {}
 
@@ -34,7 +35,17 @@ void CMenu::print() {
 int CMenu::runCommand() {
     print();
     std::cout << "\n   Select >> ";
-    std::cin >> select;
-    if (select>0 & select<=count) return items[select - 1].run();
-    else return 0;
+    if (!(std::cin >> select)) {
+        std::cin.clear();
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        throw std::invalid_argument("Некорректный выбор пункта меню");
+    }
+    std::cout << "Выбран пункт: " << select << "\n";
+    if (select > 0 && static_cast<size_t>(select) <= count) {
+        int result = items[select - 1].run();
+        std::cout << "Функция вернула: " << result << "\n";
+        return result;
+    } else {
+        return 0;
+    }
 }
