@@ -130,58 +130,53 @@ public:
     }
 
     void sort() {
-        if (m_len <= 1) {
-            std::cout << "Список пуст или содержит один элемент, сортировка не требуется\n";
-            return;
-        }
-
-        ItemList<T>* current = m_start;
-        while (current != nullptr && current != m_end) {
-            current->setNext(nullptr);
-            current->setBack(nullptr);
-            current = current->getNext();
-        }
-
-        ItemList<T>* sorted = nullptr;
-        current = m_start;
-        
-        while (current != nullptr && current != m_end) {
-            ItemList<T>* next = current->getNext();
-            
-            if (sorted == nullptr || sorted->get() > current->get()) {
-                current->setNext(sorted);
-                if (sorted) sorted->setBack(current);
-                current->setBack(nullptr);
-                sorted = current;
-            } else {
-                ItemList<T>* temp = sorted;
-                while (temp->getNext() != nullptr && temp->getNext()->get() < current->get()) {
-                    temp = temp->getNext();
-                }
-                current->setNext(temp->getNext());
-                if (temp->getNext()) temp->getNext()->setBack(current);
-                temp->setNext(current);
-                current->setBack(temp);
-            }
-            current = next;
-        }
-
-        m_start = sorted;
-        if (m_start == nullptr) {
-            m_start = m_end;
-            m_end->setBack(nullptr);
-            return;
-        }
-
-        ItemList<T>* newEnd = m_start;
-        while (newEnd->getNext() != nullptr) {
-            newEnd = newEnd->getNext();
-        }
-        newEnd->setNext(m_end);
-        m_end->setBack(newEnd);
-
-        std::cout << "Сортировка завершена\n";
+    if (m_len <= 1) {
+        return; // Не нужно выводить сообщение - это внутренняя логика
     }
+
+    bool swapped;
+    do {
+        swapped = false;
+        ItemList<T>* prev = nullptr;
+        ItemList<T>* curr = m_start;
+        ItemList<T>* next = curr->getNext();
+
+        while (next != nullptr && next != m_end) {
+            if (curr->get() > next->get()) {
+                // Меняем местами curr и next
+                if (prev != nullptr) {
+                    prev->setNext(next);
+                } else {
+                    m_start = next;
+                }
+
+                curr->setNext(next->getNext());
+                next->setNext(curr);
+                
+                // Обновляем back-ссылки
+                if (curr->getNext() != nullptr) {
+                    curr->getNext()->setBack(curr);
+                }
+                curr->setBack(next);
+                next->setBack(prev);
+                
+                // Обновляем указатели для следующей итерации
+                prev = next;
+                next = curr->getNext();
+                swapped = true;
+            } else {
+                prev = curr;
+                curr = next;
+                next = next->getNext();
+            }
+        }
+        
+        // Обновляем m_end если последний элемент изменился
+        if (curr->getNext() == m_end) {
+            m_end->setBack(curr);
+        }
+    } while (swapped);
+}
 
     iterator begin() { return iterator(m_start); }
     iterator end() { return iterator(m_end); }

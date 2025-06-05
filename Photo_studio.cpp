@@ -107,29 +107,37 @@ int sortServicesByPrice() {
 int addEmployee() {
     try {
         string firstName, lastName, login, password, position;
-        int age;
+        int age = 0;
         
         cout << "Введите имя: ";
         cin >> firstName;
         cout << "Введите фамилию: ";
         cin >> lastName;
-        cout << "Введите возраст: ";
-        cin >> age;
-        if (age <= 0) throw std::invalid_argument("Возраст должен быть положительным");
+        while (true) {
+            cout << "Введите возраст: ";
+            if (cin >> age) {
+                if (age > 0) {
+                    break;
+                } else {
+                    cout << "Ошибка: возраст должен быть положительным числом. Попробуйте снова.\n";
+                }
+            } else {
+                cout << "Ошибка: введите число для возраста. Попробуйте снова.\n";
+                cin.clear();
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            }
+        }
         cout << "Введите логин: ";
         cin >> login;
         cout << "Введите пароль: ";
         cin >> password;
-        cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
         cout << "Введите должность: ";
         getline(cin, position);
         
         Employee* emp = new Employee(firstName, lastName, age, login, password, position);
         employees.add(new ItemList<Employee>(*emp));
         cout << "Сотрудник добавлен:\n" << *emp << endl;
-        return 8;
-    } catch (const std::invalid_argument& e) {
-        cout << "Ошибка ввода: " << e.what() << endl;
         return 8;
     } catch (const std::bad_alloc& e) {
         cout << "Ошибка памяти: " << e.what() << endl;
@@ -151,31 +159,51 @@ int addClient() {
         }
         
         string firstName, lastName, login, password;
-        int age, serviceChoice;
+        int age=0, serviceChoice=0;
         
         cout << "Введите имя: ";
         cin >> firstName;
         cout << "Введите фамилию: ";
         cin >> lastName;
-        cout << "Введите возраст: ";
-        cin >> age;
-        if (age <= 0) throw std::invalid_argument("Возраст должен быть положительным");
+        while (true) {
+            cout << "Введите возраст: ";
+            if (cin >> age) {
+                if (age > 0) {
+                    break;
+                } else {
+                    cout << "Ошибка: возраст должен быть положительным числом. Попробуйте снова.\n";
+                }
+            } else {
+                cout << "Ошибка: введите число для возраста. Попробуйте снова.\n";
+                cin.clear();
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            }
+        }
         cout << "Введите логин: ";
         cin >> login;
         cout << "Введите пароль: ";
         cin >> password;
         
-        cout << "Выберите услугу:\n";
+        while (true) {
+            cout << "Выберите услугу:\n";
+            size_t idx = 1;
+            for (auto it = services.begin(); it != services.end(); ++it, ++idx) {
+                cout << idx << ". " << (*it).get().getName() << " (" << (*it).get().getPrice() << ")\n";
+            }
+
+            if (cin >> serviceChoice) {
+                if (serviceChoice > 0 && static_cast<size_t>(serviceChoice) <= services.len()) {
+                    break;
+                } else {
+                    cout << "Ошибка: введите номер услуги из списка. Попробуйте снова.\n";
+                }
+            } else {
+                cout << "Ошибка: введите число. Попробуйте снова.\n";
+                cin.clear();
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            }
+        }
         size_t idx = 1;
-        for (auto it = services.begin(); it != services.end(); ++it, ++idx) {
-            cout << idx << ". " << (*it).get().getName() << " (" << (*it).get().getPrice() << ")\n";
-        }
-        cin >> serviceChoice;
-        if (serviceChoice <= 0 || static_cast<size_t>(serviceChoice) > services.len()) {
-            throw std::out_of_range("Неверный выбор услуги");
-        }
-        
-        idx = 1;
         ItemList<Service>* selectedService = nullptr;
         for (auto it = services.begin(); it != services.end(); ++it, ++idx) {
             if (idx == static_cast<size_t>(serviceChoice)) {
@@ -183,20 +211,13 @@ int addClient() {
                 break;
             }
         }
+
         if (selectedService) {
             Client* newClient = new Client(firstName, lastName, age, login, password, selectedService->get());
             clients.add(new ItemList<Client>(*newClient));
-            cout << "Клиент добавлен:\n";
-            for (auto it = clients.begin(); it != clients.end(); ++it) {
-                cout << (*it).get() << endl;
-            }
+            cout << "Клиент добавлен:\n" << *newClient << endl;
         }
-        return 11;
-    } catch (const std::invalid_argument& e) {
-        cout << "Ошибка ввода: " << e.what() << endl;
-        return 11;
-    } catch (const std::out_of_range& e) {
-        cout << "Ошибка выбора: " << e.what() << endl;
+
         return 11;
     } catch (const std::bad_alloc& e) {
         cout << "Ошибка памяти: " << e.what() << endl;
